@@ -1,5 +1,6 @@
 import login from "@/services/auth";
-import { createContext, PropsWithChildren, useContext, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
+import cookie from 'js-cookie';
 
 type AuthContextType = {
     authToken: string | null
@@ -13,10 +14,18 @@ type AuthProviderProps = PropsWithChildren;
 export default function AuthProvider({ children }: AuthProviderProps) {
     const [authToken, setAuthToken] = useState<string | null>(null)
 
+    useEffect(() => {
+        const token = cookie.get('token')
+        if (token) {
+            setAuthToken(token)
+        }
+    }, [])
+
     async function handleLogin(credentials: any) {
         try {
             const response = await login(credentials)
             setAuthToken(response)
+            cookie.set('token', response)
             return true;
         } catch (error) {
             setAuthToken(null)

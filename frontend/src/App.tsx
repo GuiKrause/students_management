@@ -13,7 +13,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useAuth } from "./contexts/AuthProvider.tsx"
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useEffect, useState } from "react"
 
 const formSchema = z.object({

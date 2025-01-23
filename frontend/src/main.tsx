@@ -11,13 +11,13 @@ import ProtectedRoute from './utils/ProtectedRoute.tsx'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />
+    element: <App key={'login'}/>
   },
   {
     path: '/home',
     element: (
       <ProtectedRoute>
-        <Home />
+        <Home key={'home'}/>
       </ProtectedRoute>
     ),
   }
