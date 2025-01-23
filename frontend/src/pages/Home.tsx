@@ -71,13 +71,34 @@ export default function Home() {
         getAlunos();
     }, [authToken]);
 
-    const handleDelete = (aluno: any) => {
-        // Add your delete logic here
-        console.log('Deleted aluno:', aluno.id);
+    async function deleteAluno(studentId: string) {
+        setLoading(true);
+        setError(null);
 
-        // Close the dialog after deletion
+        try {
+            const response = await fetch(`http://localhost:3000/student/${studentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete: ${response.statusText}`);
+            }
+
+            // Remove the deleted student from the list locally
+            setAlunos((prevAlunos) => prevAlunos.filter((aluno) => aluno._id !== studentId));
+        } catch (err: any) {
+            setError(err instanceof Error ? err.message : 'Something went wrong');
+        } finally {
+            setLoading(false);
+        }
+
+        // Close the delete confirmation dialog after the operation
         setOpenDeleteDialog(false);
-    };
+    }
 
     return (
         <>
@@ -105,7 +126,7 @@ export default function Home() {
                             </TableHeader>
                             <TableBody key={'table-body'}>
                                 {alunos.map((aluno) => (
-                                    <TableRow key={aluno.id} className="border-t">
+                                    <TableRow key={aluno._id} className="border-t">
                                         <TableCell className="font-medium px-4">{aluno.name}</TableCell>
                                         <TableCell className="px-4">{aluno.age}</TableCell>
                                         <TableCell className="px-4">{aluno.grade}</TableCell>
@@ -136,21 +157,19 @@ export default function Home() {
                                                     <AlertDialogHeader>
                                                         <AlertDialogTitle>Você tem certeza absoluta?</AlertDialogTitle>
                                                         <AlertDialogDescription>
-                                                            Esta ação não pode ser desfeita. Ela excluirá permanentemente sua conta e removerá seus dados dos nossos servidores.
+                                                            Esta ação não pode ser desfeita. Ela excluirá permanentemente os dados do aluno.
                                                         </AlertDialogDescription>
-
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel onClick={() => setOpenDeleteDialog(false)}>
-                                                            Cancel
+                                                            Cancelar
                                                         </AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => handleDelete(aluno)}>Continue</AlertDialogAction>
+                                                        <AlertDialogAction className="bg-red-500 hover:bg-red-600" onClick={() => deleteAluno(aluno._id)}>Continue</AlertDialogAction>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>
                                         </TableCell>
                                     </TableRow>
-
                                 ))}
                             </TableBody>
                         </Table>
