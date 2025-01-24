@@ -21,8 +21,13 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { AppSidebar } from "@/components/AppSidebar.tsx"
+import {
+    SidebarInset,
+    SidebarProvider,
+    SidebarTrigger,
+} from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react";
 
@@ -32,14 +37,22 @@ import { useAuth } from "@/contexts/AuthProvider.tsx";
 
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 
+import { useNavigate } from "react-router";
+
+import { useToast } from "@/hooks/use-toast"
 
 export default function Home() {
     const { authToken } = useAuth()
+
+    const { toast } = useToast()
 
     const [alunos, setAlunos] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [studentIdToDelete, setStudentIdToDelete] = useState<string | null>(null);
+
+    const navigate = useNavigate();
 
     async function getAlunos() {
         setLoading(true);
@@ -59,7 +72,8 @@ export default function Home() {
             }
 
             const data: User[] = await response.json();
-            setAlunos(data);
+            const reversedList = data.reverse();
+            setAlunos(reversedList);
         } catch (err: any) {
             setError(err instanceof Error ? err.message : 'Something went wrong');
         } finally {
@@ -90,92 +104,121 @@ export default function Home() {
 
             // Remove the deleted student from the list locally
             setAlunos((prevAlunos) => prevAlunos.filter((aluno) => aluno._id !== studentId));
+
+            toast({
+                title: "Sucesso!",
+                description: "Aluno removido com sucesso",
+                color: "#10B981",
+                duration: 5000,
+            })
         } catch (err: any) {
             setError(err instanceof Error ? err.message : 'Something went wrong');
         } finally {
             setLoading(false);
+            // Close the delete confirmation dialog after the operation
+            setOpenDeleteDialog(false);
         }
 
-        // Close the delete confirmation dialog after the operation
-        setOpenDeleteDialog(false);
+    }
+
+    function handleNavigate() {
+        navigate("/student");
     }
 
     return (
         <>
-            <header className="bg-[#EC622C] text-white text-center p-4 text-2xl justify-start flex">
+            {/* <header className="bg-[#EC622C] text-white text-center p-4 text-2xl justify-start flex">
                 <h1 className="font-bold lg:ml-8 text-3xl">CODETECH</h1>
-            </header>
-            <main className="p-10 lg:mx-8">
-                <section className="flex justify-between items-center mb-10">
-                    <h2 className="text-2xl font-semibold">Alunos</h2>
-                    <Button size={"lg"} className="bg-[#EC622C] hover:bg-[#ec622ced]">Criar Registro</Button>
-                </section>
-                <div>
-                    {loading && <p>Loading students...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
-                    {!loading && !error && alunos.length === 0 && <p>No students found.</p>}
-                    {!loading && !error && alunos.length > 0 && (
-                        <Table className="w-full border-collapse">
-                            <TableHeader key={'header'}>
-                                <TableRow key={'header-row'} className="bg-gray-100">
-                                    <TableHead className="text-left px-4">Nome</TableHead>
-                                    <TableHead className="text-left px-4">Idade</TableHead>
-                                    <TableHead className="text-left px-4">Turma</TableHead>
-                                    <TableHead className="w-12 text-right px-4">Opções</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody key={'table-body'}>
-                                {alunos.map((aluno) => (
-                                    <TableRow key={aluno._id} className="border-t">
-                                        <TableCell className="font-medium px-4">{aluno.name}</TableCell>
-                                        <TableCell className="px-4">{aluno.age}</TableCell>
-                                        <TableCell className="px-4">{aluno.grade}</TableCell>
-                                        <TableCell className="text-right flex justify-center">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="focus-visible:ring-0">
-                                                        <span className="sr-only">Open menu</span>
-                                                        <MoreHorizontal />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem key={'edit'} className="cursor-pointer">
-                                                        <Pencil />Editar
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        key={'delete'}
-                                                        className="cursor-pointer"
-                                                        onClick={() => setOpenDeleteDialog(true)}
-                                                    >
-                                                        <Trash2 />Deletar
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+            </header> */}
+            <SidebarProvider>
+                <AppSidebar />
+                <SidebarInset>
+                    <SidebarTrigger />
+                    <main className="p-10 lg:mx-8">
+                        <section className="flex justify-between items-center mb-10">
+                            <h2 className="text-2xl font-semibold">Alunos</h2>
+                            <Button onClick={handleNavigate} size={"lg"} className="bg-orange-400 hover:bg-orange-600">Criar Registro</Button>
+                        </section>
+                        <section>
+                            {loading && <p>Loading students...</p>}
+                            {error && <p className="text-red-500">{error}</p>}
+                            {!loading && !error && alunos.length === 0 && <p>No students found.</p>}
+                            {!loading && !error && alunos.length > 0 && (
+                                <Table className="w-full border-collapse">
+                                    <TableHeader key={'header'}>
+                                        <TableRow key={'header-row'} className="bg-gray-100">
+                                            <TableHead className="text-left px-4">Nome</TableHead>
+                                            <TableHead className="text-left px-4">Idade</TableHead>
+                                            <TableHead className="text-left px-4">Turma</TableHead>
+                                            <TableHead className="w-12 text-right px-4">Opções</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody key={'table-body'}>
+                                        {alunos.map((aluno) => (
+                                            <TableRow key={aluno._id} className="border-t">
+                                                <TableCell className="font-medium px-4">{aluno.name}</TableCell>
+                                                <TableCell className="px-4">{aluno.age}</TableCell>
+                                                <TableCell className="px-4">{aluno.grade}</TableCell>
+                                                <TableCell className="text-right flex justify-center">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" className="focus-visible:ring-0">
+                                                                <span className="sr-only">Open menu</span>
+                                                                <MoreHorizontal />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem key={'edit'} className="cursor-pointer">
+                                                                <Pencil />Editar
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                key={'delete'}
+                                                                className="cursor-pointer"
+                                                                onClick={() => {
+                                                                    setStudentIdToDelete(aluno._id);
+                                                                    setOpenDeleteDialog(true)
+                                                                }}
+                                                            >
+                                                                <Trash2 />Deletar
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
 
-                                            <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Você tem certeza absoluta?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            Esta ação não pode ser desfeita. Ela excluirá permanentemente os dados do aluno.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel onClick={() => setOpenDeleteDialog(false)}>
-                                                            Cancelar
-                                                        </AlertDialogCancel>
-                                                        <AlertDialogAction className="bg-red-500 hover:bg-red-600" onClick={() => deleteAluno(aluno._id)}>Continue</AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    )}
-                </div>
-            </main>
+                                                    <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle>Você tem certeza absoluta?</AlertDialogTitle>
+                                                                <AlertDialogDescription>
+                                                                    Esta ação não pode ser desfeita. Ela excluirá permanentemente os dados do aluno.
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel onClick={() => setOpenDeleteDialog(false)}>
+                                                                    Cancelar
+                                                                </AlertDialogCancel>
+                                                                <AlertDialogAction
+                                                                    className="bg-red-500 hover:bg-red-600"
+                                                                    onClick={() => {
+                                                                        if (studentIdToDelete) {
+                                                                            deleteAluno(studentIdToDelete);  // Use the specific student ID
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Continue
+                                                                </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
+                        </section>
+                    </main>
+                </SidebarInset>
+            </SidebarProvider>
         </>
     )
 }

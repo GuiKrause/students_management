@@ -88,7 +88,7 @@ export default function App() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-[#EC622C] hover:bg-[#ec622ced]">{isLoading ? "Logging in..." : "Login"}</Button>
+            <Button type="submit" className="w-full bg-orange-400 hover:bg-[#ec622ced] transition-none hover:scale-1">{isLoading ? "Logging in..." : "Login"}</Button>
             <p className="text-xs text-center">Não possui uma conta? <span className="text-[#ec622cc4] cursor-pointer">Registrar</span></p>
           </form>
         </Form>
