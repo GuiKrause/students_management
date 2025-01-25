@@ -50,9 +50,7 @@ class StudentController {
     async deleteStudent(req, res) {
         try {
             const id = req.params.id;
-            console.log(id);
             const deletedStudent = await Student.findByIdAndDelete({ _id: id });
-            console.log(deletedStudent);
             if (!deletedStudent) return res.status(404).json({ message: 'Student not found' });
             res.json({ message: 'Student deleted successfully' });
         } catch (error) {

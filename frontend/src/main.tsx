@@ -32,6 +32,14 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  {
+    path: '/student/:id',
+    element: (
+      <ProtectedRoute>
+        <UserForm key={'user-form'} />
+      </ProtectedRoute>
+    ),
+  },
 ])
 
 createRoot(document.getElementById('root')!).render(

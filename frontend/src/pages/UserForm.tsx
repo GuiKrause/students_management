@@ -21,29 +21,64 @@ import { useForm } from "react-hook-form"
 
 import { z } from "zod"
 import { useAuth } from "@/contexts/AuthProvider";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 const formSchema = z.object({
-    name: z.string().min(2).max(50),
-    age: z
+    name: z
         .string()
-        .refine((val) => !isNaN(Number(val)), { message: "Must be a number" })
+        .min(2, "Nome deve conter no mínimo 2 caracteres")
+        .max(256, "Nome deve conter no máximo 256 caracteres")
+        .regex(/^[A-Za-zÁ-Úá-úÀ-ùÊ-îò-ôôœãõç\s]+$/, "Nome deve conter apenas letras e espaços com acentos"),
+
+        age: z
+        .string({
+            required_error: "Idade é obrigatória",
+            invalid_type_error: "Idade deve ser um valor válido",
+        })
+        .min(1, "Idade é obrigatória")
+        .refine((val) => !isNaN(Number(val)), { message: "Idade deve ser um número" })
+        .transform((val) => val.trim())  // Ensure it's a string after transformation
         .transform((val) => Number(val)),
-    grade: z.string().min(1).max(50),
+
+    grade: z
+        .string()
+        .min(1, "Nota deve conter no mínimo 1 caractere")
+        .max(50, "Nota deve conter no máximo 50 caracteres")
+        .regex(/^[A-Za-zÁ-Úá-úÀ-ùÊ-îò-ôôœãõç\s]+$/, "Nota deve conter apenas letras e espaços com acentos"),
 })
 
 export default function UserForm() {
+    const { state } = useLocation();
+    
+    const [user, setUser] = useState<any | null>(null);
+
+    useEffect(() => {
+        if (state != null) {
+            setUser(state.alunoToEdit);
+        }
+    }, [state]);
+
     const { authToken } = useAuth()
 
     const { toast } = useToast()
+
+    const navigate = useNavigate();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
-            age: 0,
             grade: "",
+            age: undefined,
         },
     })
+
+    useEffect(() => {
+        if (user != null) {
+            form.reset({ name: user.name, grade: user.grade, age: user.age }); // Set form values if user data is available
+        }
+    }, [user, form]);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
@@ -63,19 +98,22 @@ export default function UserForm() {
             toast({
                 title: "Sucesso!",
                 description: "Aluno cadastrado com sucesso",
-                color: "#10B981",
-                duration: 5000,
+                duration: 3000,
+                className: "bg-green-300",
             })
 
         } catch (error) {
             toast({
                 title: "Erro",
                 description: "Ocorreu um problema ao cadastrar o aluno",
-                variant: "destructive",
-                duration: 5000,
+                duration: 3000,
+                className: "bg-red-300",
             })
         }
+    }
 
+    function handleNavigate() {
+        navigate("/home");
     }
 
     return (
@@ -131,7 +169,10 @@ export default function UserForm() {
                                         )}
                                     />
                                 </div>
-                                <Button size={"lg"} className="w-fit bg-orange-400 hover:bg-orange-600 self">Cadastrar</Button>
+                                <div className="flex gap-4 self-end">
+                                    <Button onClick={handleNavigate} size={"lg"} className="w-fit bg-white text-orange-600 border-orange-600 border-[1px] hover:bg-orange-600 hover:text-white">Cancelar</Button>
+                                    <Button size={"lg"} className="w-fit bg-orange-400 hover:bg-orange-600">{user == null ? "Cadastrar" : "Editar"}</Button>
+                                </div>
                             </form>
                         </Form>
                     </section>

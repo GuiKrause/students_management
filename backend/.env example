@@ -1,3 +1,4 @@
 # Here you can set the port for the server
 # PORT=
 # SECRET_KEY=
+# MONGO_URI=

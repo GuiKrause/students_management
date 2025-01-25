@@ -108,8 +108,8 @@ export default function Home() {
             toast({
                 title: "Sucesso!",
                 description: "Aluno removido com sucesso",
-                color: "#10B981",
-                duration: 5000,
+                duration: 3000,
+                className: "bg-green-300",
             })
         } catch (err: any) {
             setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -124,6 +124,13 @@ export default function Home() {
     function handleNavigate() {
         navigate("/student");
     }
+
+    const handleEdit = (alunoId: string) => {
+        console.log(alunoId);
+        const alunoToEdit = alunos.find((aluno: any) => aluno._id === alunoId);
+        console.log(alunoToEdit);
+        navigate(`/student/${alunoId}`, { state: { alunoToEdit } });
+    };
 
     return (
         <>
@@ -145,8 +152,8 @@ export default function Home() {
                             {!loading && !error && alunos.length === 0 && <p>No students found.</p>}
                             {!loading && !error && alunos.length > 0 && (
                                 <Table className="w-full border-collapse">
-                                    <TableHeader key={'header'}>
-                                        <TableRow key={'header-row'} className="bg-gray-100">
+                                    <TableHeader key={'header'} >
+                                        <TableRow key={'header-row'} className="bg-[#EEEEEE] cursor-default">
                                             <TableHead className="text-left px-4">Nome</TableHead>
                                             <TableHead className="text-left px-4">Idade</TableHead>
                                             <TableHead className="text-left px-4">Turma</TableHead>
@@ -155,7 +162,10 @@ export default function Home() {
                                     </TableHeader>
                                     <TableBody key={'table-body'}>
                                         {alunos.map((aluno) => (
-                                            <TableRow key={aluno._id} className="border-t">
+                                            <TableRow
+                                                key={aluno._id}
+                                                className={'border-t cursor-default'}
+                                            >
                                                 <TableCell className="font-medium px-4">{aluno.name}</TableCell>
                                                 <TableCell className="px-4">{aluno.age}</TableCell>
                                                 <TableCell className="px-4">{aluno.grade}</TableCell>
@@ -168,7 +178,11 @@ export default function Home() {
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem key={'edit'} className="cursor-pointer">
+                                                            <DropdownMenuItem 
+                                                                key={'edit'} 
+                                                                className="cursor-pointer"
+                                                                onClick={() => handleEdit(aluno._id)}
+                                                            >
                                                                 <Pencil />Editar
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
