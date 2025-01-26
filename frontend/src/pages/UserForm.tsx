@@ -77,7 +77,7 @@ export default function UserForm() {
 
     useEffect(() => {
         if (user != null) {
-            form.reset({ name: user.name, grade: user.grade, age: user.age }); // Set form values if user data is available
+            form.reset({ name: user.name, grade: user.grade, age: user.age.toString() }); // Set form values if user data is available
         }
     }, [user, form]);
 
@@ -210,7 +210,10 @@ export default function UserForm() {
                                     />
                                 </div>
                                 <div className="flex gap-4 self-end">
-                                    <Button onClick={handleNavigate} size={"lg"} className="w-fit bg-white text-orange-600 border-orange-600 border-[1px] hover:bg-orange-600 hover:text-white">Cancelar</Button>
+                                    <Button onClick={(e) => {
+                                        e.preventDefault();
+                                        handleNavigate();
+                                    }} size={"lg"} className="w-fit bg-white text-orange-600 border-orange-600 border-[1px] hover:bg-orange-600 hover:text-white">Cancelar</Button>
                                     <Button size={"lg"} className="w-fit bg-orange-400 hover:bg-orange-600">{user == null ? "Cadastrar" : "Editar"}</Button>
                                 </div>
                             </form>

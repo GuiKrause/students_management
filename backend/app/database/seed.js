@@ -34,12 +34,25 @@ const generateUsers = async () => {
   ];
 };
 
-// Generate 10 students
-const students = Array.from({ length: 100 }, () => ({
-  name: faker.person.fullName(),
-  age: faker.number.int({ min: 18, max: 25 }),
-  grade: faker.helpers.arrayElement(['A', 'B', 'C', 'D', 'E']),
-}));
+// Generate 100 students with unique names
+const generateUniqueStudents = () => {
+  const studentNames = new Set();
+  const students = [];
+
+  while (students.length < 100) {
+    const name = faker.person.fullName();
+    if (!studentNames.has(name)) {
+      studentNames.add(name);
+      students.push({
+        name,
+        age: faker.number.int({ min: 18, max: 25 }),
+        grade: faker.helpers.arrayElement(['A', 'B', 'C', 'D', 'E']),
+      });
+    }
+  }
+
+  return students;
+};
 
 // Seed the database
 const seedDatabase = async () => {
@@ -52,7 +65,8 @@ const seedDatabase = async () => {
     await User.insertMany(users);
     console.log('Users added.');
 
-    await Student.insertMany(students);
+    const uniqueStudents = generateUniqueStudents();
+    await Student.insertMany(uniqueStudents);
     console.log('Students added.');
   } catch (error) {
     console.error('Error seeding the database:', error);

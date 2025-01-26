@@ -63,36 +63,34 @@ export default function Home() {
     const [studentIdToDelete, setStudentIdToDelete] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+    const [previousPage, setPreviousPage] = useState<number | null>(null);
 
     const navigate = useNavigate();
 
     const fetchStudents = async (page: number, query: string) => {
         setLoading(true);
         try {
-            let response;
-            if (query) {
-                response = await fetch(`http://localhost:3000/student/?page=${page}&name=${query}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                });
-            } else {
-                response = await fetch(`http://localhost:3000/student/?page=${page}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                });
-            }
+            const url = query
+                ? `http://localhost:3000/student/?page=${page}&name=${query}`
+                : `http://localhost:3000/student/?page=${page}`;
+
+            console.log('Fetching data from URL:', url); // Added for debugging
+
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+            });
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch: ${response.statusText}`);
             }
 
             const data = await response.json();
+            console.log(data.data);
+            
             setStudents(data.data);
             setCurrentPage(data.page);
             setTotalPages(data.totalPages);
@@ -103,18 +101,25 @@ export default function Home() {
         }
     };
 
+    useEffect(() => {
+        if (searchQuery.trim() !== "") {
+            if (currentPage !== 1) {
+                setPreviousPage(currentPage); // Save the current page before resetting
+                setCurrentPage(1); // Reset to page 1 for a new search
+            }
+        } else if (previousPage !== null) {
+            setCurrentPage(previousPage); // Restore previous page on clearing input
+            setPreviousPage(null); // Clear saved page
+        }
+    }, [searchQuery]);
+
     // Fetch students when currentPage changes
     useEffect(() => {
         if (currentPage) {
             fetchStudents(currentPage, debouncedSearchQuery);
-        }
-    }, [currentPage, debouncedSearchQuery]);  // Fetch when currentPage changes
-
-    useEffect(() => {
-        if (currentPage) {
             navigate(`?page=${currentPage}`, { replace: true }); // Only navigate when currentPage actually changes
         }
-    }, [currentPage, navigate]);
+    }, [currentPage, debouncedSearchQuery, navigate]);  // Fetch when currentPage changes
 
     useEffect(() => {
         const debounced = setTimeout(() => {
@@ -141,8 +146,7 @@ export default function Home() {
                 throw new Error(`Failed to delete: ${response.statusText}`);
             }
 
-            // Remove the deleted student from the list locally
-            setStudents((prevAlunos) => prevAlunos.filter((aluno) => aluno._id !== studentId));
+            fetchStudents(currentPage, debouncedSearchQuery);  // Refetch students after deletion
 
             toast({
                 title: "Sucesso!",
@@ -185,28 +189,28 @@ export default function Home() {
                     <main className="p-4 lg:mx-8">
                         <section className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-semibold">Alunos</h2>
-                            <Button onClick={() => handleNavigate('home')} size={"lg"} className="bg-orange-400 hover:bg-orange-600">Criar Registro</Button>
+                            <Button onClick={() => handleNavigate('student')} size={"lg"} className="bg-orange-400 hover:bg-orange-600">Criar Registro</Button>
                         </section>
                         <section>
+                            <Input
+                                type="text"
+                                placeholder="Buscar por nome..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="mb-4 p-2 border rounded-md w-1/2"
+                            />
                             {loading && <p>Loading students...</p>}
                             {error && <p className="text-red-500">{error}</p>}
-                            {!loading && !error && students.length === 0 && <p>No students found.</p>}
+                            {!loading && !error && students.length === 0 && <p>Nenhum estudante econtrado</p>}
                             {!loading && !error && students.length > 0 && (
                                 <>
-                                    <Input
-                                        type="text"
-                                        placeholder="Buscar por nome..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="mb-4 p-2 border rounded-md w-1/2"
-                                    />
                                     <Table className="w-full border-collapse">
                                         <TableHeader key={'header'} >
                                             <TableRow key={'header-row'} className="bg-[#EEEEEE] cursor-default">
-                                                <TableHead className="text-left px-4">Nome</TableHead>
-                                                <TableHead className="text-left px-4">Idade</TableHead>
-                                                <TableHead className="text-left px-4">Turma</TableHead>
-                                                <TableHead className="w-12 text-right px-4">Opções</TableHead>
+                                                <TableHead className="w-4/12 text-left px-4">Nome</TableHead>
+                                                <TableHead className="w-1/4 text-center px-4">Idade</TableHead>
+                                                <TableHead className="w-1/4 text-center px-4">Turma</TableHead>
+                                                <TableHead className="w-1/12 px-4 text-center">Opções</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody key={'table-body'}>
@@ -216,8 +220,8 @@ export default function Home() {
                                                     className={'border-t cursor-default'}
                                                 >
                                                     <TableCell className="font-medium px-4">{student.name}</TableCell>
-                                                    <TableCell className="px-4">{student.age}</TableCell>
-                                                    <TableCell className="px-4">{student.grade}</TableCell>
+                                                    <TableCell className="text-center px-4">{student.age}</TableCell>
+                                                    <TableCell className="text-center px-4">{student.grade}</TableCell>
                                                     <TableCell className="text-right flex justify-center">
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>
@@ -289,7 +293,7 @@ export default function Home() {
                                             </PaginationItem>
 
                                             {/* First Pages (1, 2, 3) */}
-                                            {Array.from({ length: 3 }).map((_, index) => (
+                                            {Array.from({ length: Math.min(3, totalPages) }).map((_, index) => (
                                                 <PaginationItem key={index}>
                                                     <PaginationLink
                                                         className="cursor-pointer"

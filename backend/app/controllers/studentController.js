@@ -27,32 +27,33 @@ class StudentController {
                 return res.json(student);
             }
 
-            // Handle pagination
-            const page = parseInt(req.query.page) || 1; // Default to page 1
-            const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
-            const skip = (page - 1) * limit;
+            // Get pagination details from query params
+            const { page = 1, limit = 10, name = '' } = req.query;
 
-            // Get the 'name' query parameter if provided
-            const name = req.query.name ? req.query.name : '';
+            // Create a case-insensitive regex to match names if 'name' is provided
+            const nameRegex = name ? new RegExp(`^${name}`, 'i') : null;
 
-            // Create a case-insensitive regex to match names
-            const nameRegex = new RegExp(`^${name}`, 'i'); // 'i' makes it case-insensitive
+            const query = nameRegex ? { name: { $regex: nameRegex } } : {};
 
-            // Fetch paginated students and the total count, with optional name filtering
-            const [students, total] = await Promise.all([
-                Student.find({ name: { $regex: nameRegex } }).skip(skip).limit(limit),
-                Student.countDocuments({ name: { $regex: nameRegex } })
-            ]);
+            // Paginate using mongoose-paginate-v2
+            const options = {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                sort: { createdAt: -1 },
+                lean: true
+            };
 
-            // Return paginated results
+            const result = await Student.paginate(query, options);
+
             res.json({
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-                data: students
+                page: result.page,
+                limit: result.limit,
+                total: result.totalDocs,
+                totalPages: result.totalPages,
+                data: result.docs
             });
         } catch (error) {
+            console.error(error);
             res.status(500).json({ error: error.message });
         }
     }
