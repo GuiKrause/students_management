@@ -14,9 +14,21 @@ import {
 } from "@/components/ui/sidebar"
 import { LogOut, UserRoundPlus, UsersRound } from "lucide-react"
 import { useAuth } from "@/contexts/AuthProvider";
+import { useNavigate } from "react-router";
+
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { handleLogout } = useAuth()
+
+    const navigate = useNavigate();
+
+    function handleNavigate(route: string) {
+        if (route === "") {
+            return navigate("/");
+        } else {
+            navigate(`/${route}`);
+        }
+    }
 
     return (
         <Sidebar {...props}>
@@ -63,7 +75,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarFooter className="items-center text-center">
                 <SidebarMenuItem key={"create-student"} className="cursor-pointer w-full" onClick={() => {
                     handleLogout();
-                    window.location.reload();
+                    handleNavigate("");
                 }}>
                     <SidebarMenuButton asChild>
                         <div>

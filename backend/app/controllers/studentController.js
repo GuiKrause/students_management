@@ -18,14 +18,40 @@ class StudentController {
     // Get a student by ID or all students
     async getStudents(req, res) {
         try {
+            // Check if a specific student ID is provided
             if (req.params.id) {
                 const student = await Student.findById(req.params.id);
-                if (!student) return res.status(404).json({ message: 'Student not found' });
+                if (!student) {
+                    return res.status(404).json({ message: 'Student not found' });
+                }
                 return res.json(student);
             }
 
-            const students = await Student.find();
-            res.json(students);
+            // Handle pagination
+            const page = parseInt(req.query.page) || 1; // Default to page 1
+            const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+            const skip = (page - 1) * limit;
+
+            // Get the 'name' query parameter if provided
+            const name = req.query.name ? req.query.name : '';
+
+            // Create a case-insensitive regex to match names
+            const nameRegex = new RegExp(`^${name}`, 'i'); // 'i' makes it case-insensitive
+
+            // Fetch paginated students and the total count, with optional name filtering
+            const [students, total] = await Promise.all([
+                Student.find({ name: { $regex: nameRegex } }).skip(skip).limit(limit),
+                Student.countDocuments({ name: { $regex: nameRegex } })
+            ]);
+
+            // Return paginated results
+            res.json({
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+                data: students
+            });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

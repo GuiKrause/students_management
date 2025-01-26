@@ -35,7 +35,7 @@ const generateUsers = async () => {
 };
 
 // Generate 10 students
-const students = Array.from({ length: 10 }, () => ({
+const students = Array.from({ length: 100 }, () => ({
   name: faker.person.fullName(),
   age: faker.number.int({ min: 18, max: 25 }),
   grade: faker.helpers.arrayElement(['A', 'B', 'C', 'D', 'E']),

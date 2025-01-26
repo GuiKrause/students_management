@@ -10,6 +10,7 @@ import ProtectedRoute from './utils/ProtectedRoute.tsx'
 import UserForm from './pages/UserForm.tsx'
 
 import { Toaster } from "@/components/ui/toaster"
+import { CurrentPageProvider } from './contexts/CurrentPageContext.tsx'
 
 const router = createBrowserRouter([
   {
@@ -45,8 +46,10 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
-      <Toaster />
+      <CurrentPageProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </CurrentPageProvider>
     </AuthProvider>
   </StrictMode>,
 )
