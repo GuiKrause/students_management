@@ -4,6 +4,7 @@ import { NavLink } from "react-router";
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarHeader,
     SidebarMenu,
@@ -11,25 +12,12 @@ import {
     SidebarMenuItem,
     SidebarRail,
 } from "@/components/ui/sidebar"
-import { UserRoundPlus, UsersRound } from "lucide-react"
-
-// This is sample data.
-const data = {
-    navMain: [
-        {
-            title: "Alunos",
-            url: "/home",
-            icon: <UsersRound />
-        },
-        {
-            title: "Cadastro",
-            url: "/student",
-            icon: <UserRoundPlus />
-        },
-    ],
-}
+import { LogOut, UserRoundPlus, UsersRound } from "lucide-react"
+import { useAuth } from "@/contexts/AuthProvider";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { handleLogout } = useAuth()
+
     return (
         <Sidebar {...props}>
             <SidebarHeader className="mb-8">
@@ -49,19 +37,42 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarMenu>
-                        {data.navMain.map((item) => (
-                            <SidebarMenuItem key={item.title}>
+                        <NavLink to={"/home"} className="font-regular flex items-center gap-2">
+                            <SidebarMenuItem key={"students"} className="cursor-pointer w-full">
                                 <SidebarMenuButton asChild>
-                                    <NavLink to={item.url} className="font-regular">
-                                        {item.icon}
-                                        <span>{item.title}</span>
-                                    </NavLink>
+                                    <div>
+                                        <UsersRound size={18} />
+                                        <span className="text-md">Alunos</span>
+                                    </div>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                        ))}
+                        </NavLink>
+                        <NavLink to={"/student"} className="font-regular flex items-center gap-2">
+                            <SidebarMenuItem key={"create-student"} className="cursor-pointer w-full">
+                                <SidebarMenuButton asChild>
+                                    <div>
+                                        <UserRoundPlus size={18} />
+                                        <span className="text-md">Cadastro</span>
+                                    </div>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </NavLink>
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
+            <SidebarFooter className="items-center text-center">
+                <SidebarMenuItem key={"create-student"} className="cursor-pointer w-full" onClick={() => {
+                    handleLogout();
+                    window.location.reload();
+                }}>
+                    <SidebarMenuButton asChild>
+                        <div>
+                            <LogOut size={18} />
+                            <span className="text-md">Sair</span>
+                        </div>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            </SidebarFooter>
             <SidebarRail />
         </Sidebar>
     )

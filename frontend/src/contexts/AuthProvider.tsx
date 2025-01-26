@@ -4,6 +4,7 @@ import cookie from 'js-cookie';
 
 type AuthContextType = {
     authToken: string | null
+    handleLogout: () => void
     handleLogin: (credentials: { email: string, password: string }) => Promise<boolean>
 }
 
@@ -33,7 +34,12 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         }
     }
 
-    return <AuthContext.Provider value={{ authToken, handleLogin }}>{children}</AuthContext.Provider>
+    function handleLogout() {
+        setAuthToken(null)
+        cookie.remove('token')
+    }
+
+    return <AuthContext.Provider value={{ authToken, handleLogout, handleLogin }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

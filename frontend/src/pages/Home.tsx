@@ -126,11 +126,9 @@ export default function Home() {
     }
 
     const handleEdit = (alunoId: string) => {
-        console.log(alunoId);
         const alunoToEdit = alunos.find((aluno: any) => aluno._id === alunoId);
-        console.log(alunoToEdit);
         navigate(`/student/${alunoId}`, { state: { alunoToEdit } });
-    };
+    }; 
 
     return (
         <>

@@ -31,15 +31,16 @@ const formSchema = z.object({
         .max(256, "Nome deve conter no máximo 256 caracteres")
         .regex(/^[A-Za-zÁ-Úá-úÀ-ùÊ-îò-ôôœãõç\s]+$/, "Nome deve conter apenas letras e espaços com acentos"),
 
-        age: z
+    age: z
         .string({
             required_error: "Idade é obrigatória",
             invalid_type_error: "Idade deve ser um valor válido",
         })
-        .min(1, "Idade é obrigatória")
-        .refine((val) => !isNaN(Number(val)), { message: "Idade deve ser um número" })
-        .transform((val) => val.trim())  // Ensure it's a string after transformation
-        .transform((val) => Number(val)),
+        .regex(/^\d+$/, "Idade deve conter apenas números inteiros") // Ensure it contains only digits
+        .max(2, "Idade deve ter no máximo 2 caracteres") // Limit the string length to 2 characters
+        .refine((val) => parseInt(val, 10) >= 1 && parseInt(val, 10) <= 99, {
+            message: "Idade deve estar entre 1 e 99",
+        }),
 
     grade: z
         .string()
@@ -50,7 +51,7 @@ const formSchema = z.object({
 
 export default function UserForm() {
     const { state } = useLocation();
-    
+
     const [user, setUser] = useState<any | null>(null);
 
     useEffect(() => {
@@ -70,7 +71,7 @@ export default function UserForm() {
         defaultValues: {
             name: "",
             grade: "",
-            age: undefined,
+            age: "",
         },
     })
 
@@ -80,7 +81,9 @@ export default function UserForm() {
         }
     }, [user, form]);
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
+    async function handlePost(values: z.infer<typeof formSchema>) {
+        const { name, grade, age } = values;
+        const parsedAge = parseInt(age);
         try {
             const response = await fetch("http://localhost:3000/student/", {
                 method: "POST",
@@ -88,12 +91,14 @@ export default function UserForm() {
                     "Content-Type": "application/json",
                     'Authorization': `Bearer ${authToken}`,
                 },
-                body: JSON.stringify(values), // Send the form data as JSON
+                body: JSON.stringify({ name: name, grade: grade, age: parsedAge }), // Send the form data as JSON
             });
 
             if (!response.ok) {
                 throw new Error("Failed to submit the form");
             }
+
+            form.reset();
 
             toast({
                 title: "Sucesso!",
@@ -112,6 +117,41 @@ export default function UserForm() {
         }
     }
 
+    async function handleEdit(id: string, values: z.infer<typeof formSchema>) {
+        const { name, grade, age } = values;
+        const parsedAge = parseInt(age);
+
+        try {
+            const response = await fetch(`http://localhost:3000/student/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({ name: name, grade: grade, age: parsedAge }), // Send the updated data as JSON
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update the student");
+            }
+
+            toast({
+                title: "Sucesso!",
+                description: "Aluno atualizado com sucesso",
+                duration: 3000,
+                className: "bg-green-300",
+            });
+
+        } catch (error) {
+            toast({
+                title: "Erro",
+                description: "Ocorreu um problema ao atualizar o aluno",
+                duration: 3000,
+                className: "bg-red-300",
+            });
+        }
+    }
+
     function handleNavigate() {
         navigate("/home");
     }
@@ -127,7 +167,7 @@ export default function UserForm() {
                     </section>
                     <section>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-md flex flex-col">
+                            <form onSubmit={user == null ? form.handleSubmit(handlePost) : form.handleSubmit(() => handleEdit(state.alunoToEdit._id, form.getValues()))} className="space-y-4 max-w-md flex flex-col">
                                 <FormField
                                     control={form.control}
                                     name="name"
