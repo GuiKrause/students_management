@@ -38,6 +38,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { User } from "../features/types.ts";
 
@@ -90,7 +91,7 @@ export default function Home() {
 
             const data = await response.json();
             console.log(data.data);
-            
+
             setStudents(data.data);
             setCurrentPage(data.page);
             setTotalPages(data.totalPages);
@@ -186,7 +187,7 @@ export default function Home() {
                 <AppSidebar />
                 <SidebarInset>
                     <SidebarTrigger />
-                    <main className="p-4 lg:mx-8">
+                    <main className="lg:mx-8">
                         <section className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-semibold">Alunos</h2>
                             <Button onClick={() => handleNavigate('student')} size={"lg"} className="bg-orange-400 hover:bg-orange-600">Criar Registro</Button>
@@ -199,11 +200,40 @@ export default function Home() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="mb-4 p-2 border rounded-md w-1/2"
                             />
-                            {loading && <p>Loading students...</p>}
+                            {loading && (
+                                <Table className="w-full border-collapse">
+                                    <TableHeader>
+                                        <TableRow className="bg-[#EEEEEE] cursor-default">
+                                            <TableHead className="w-4/12 text-left px-4">Nome</TableHead>
+                                            <TableHead className="w-1/4 text-center px-4">Idade</TableHead>
+                                            <TableHead className="w-1/4 text-center px-4">Turma</TableHead>
+                                            <TableHead className="w-1/12 px-4 text-center">Opções</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {Array.from({ length: 10 }).map((_, index) => (
+                                            <TableRow key={index} className="border-t">
+                                                <TableCell className="px-4">
+                                                    <Skeleton className="h-10 w-full rounded" />
+                                                </TableCell>
+                                                <TableCell className="px-4 text-center">
+                                                    <Skeleton className="h-10 self-center w-1/2 rounded" />
+                                                </TableCell>
+                                                <TableCell className="px-4 text-center">
+                                                    <Skeleton className="h-10 w-20 rounded" />
+                                                </TableCell>
+                                                <TableCell className="px-4 text-center">
+                                                    <Skeleton className="h-10 w-10 rounded" />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
                             {error && <p className="text-red-500">{error}</p>}
                             {!loading && !error && students.length === 0 && <p>Nenhum estudante econtrado</p>}
                             {!loading && !error && students.length > 0 && (
-                                <>
+                                <div className="flex flex-col space-y-4 justify-between">
                                     <Table className="w-full border-collapse">
                                         <TableHeader key={'header'} >
                                             <TableRow key={'header-row'} className="bg-[#EEEEEE] cursor-default">
@@ -281,7 +311,7 @@ export default function Home() {
                                             ))}
                                         </TableBody>
                                     </Table>
-                                    <Pagination>
+                                    <Pagination >
                                         <PaginationContent>
                                             {/* Previous Button */}
                                             <PaginationItem>
@@ -359,9 +389,8 @@ export default function Home() {
                                             </PaginationItem>
                                         </PaginationContent>
                                     </Pagination>
-                                </>
+                                </div>
                             )}
-
                         </section>
                     </main>
                 </SidebarInset>
