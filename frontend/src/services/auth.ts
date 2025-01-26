@@ -31,3 +31,29 @@ export default async function login(credentials: any) {
         throw error; // Re-throw the error to handle it in the calling code
     }
 }
+
+export async function register(credentials: any) {
+    const url = 'http://localhost:3000/auth/register'; // Replace with your API endpoint
+
+    try {
+        // Send POST request with user credentials
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(credentials),
+        });
+
+        // Check if the request was successful
+        if (!response.ok) {
+            throw new Error(`Registration failed: ${response.statusText}`);
+        }
+
+        return true;
+
+    } catch (error) {
+        console.error('Error during registration:', error);
+        throw error; // Re-throw the error to handle it in the calling code
+    }
+}

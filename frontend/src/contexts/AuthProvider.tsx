@@ -1,10 +1,11 @@
-import login from "@/services/auth";
+import login, { register } from "@/services/auth";
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import cookie from 'js-cookie';
 
 type AuthContextType = {
     authToken: string | null
     handleLogout: () => void
+    handleRegister: (credentials: { email: string, password: string }) => Promise<boolean>
     handleLogin: (credentials: { email: string, password: string }) => Promise<boolean>
 }
 
@@ -34,12 +35,22 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         }
     }
 
+    async function handleRegister(credentials: any) {
+        const { email, password } = credentials;
+        try {
+            const response = await register({ email: email, password: password });
+            return response;
+        } catch (error) {
+            return false;
+        }
+    }
+
     function handleLogout() {
         setAuthToken(null)
         cookie.remove('token')
     }
 
-    return <AuthContext.Provider value={{ authToken, handleLogout, handleLogin }}>{children}</AuthContext.Provider>
+    return <AuthContext.Provider value={{ authToken, handleLogout, handleLogin, handleRegister }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
