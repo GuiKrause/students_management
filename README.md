@@ -94,7 +94,7 @@ Tela de autenticação com tbas para realizar login e registrar. Também possui 
 ## 🔧 Tecnologias Utilizadas
 
 - **Linguagens de Programação**: Javascript.
-- **Frameworks e Bibliotecas**: React, Express, Nodemon, Cors, ShadcnUI, Tailwind.
+- **Frameworks e Bibliotecas**: React, Express, Nodemon, Cors, ShadcnUI, Tailwind, Mongoose.
 - **Banco de Dados**: MongoDB.
 
 ---
