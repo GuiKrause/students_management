@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 
 class StudentController {
 
-    // Create a new student
     async createStudent(req, res) {
         try {
             const student = new Student(req.body);
@@ -15,10 +14,8 @@ class StudentController {
         }
     }
 
-    // Get a student by ID or all students
     async getStudents(req, res) {
         try {
-            // Check if a specific student ID is provided
             if (req.params.id) {
                 const student = await Student.findById(req.params.id);
                 if (!student) {
@@ -27,15 +24,12 @@ class StudentController {
                 return res.json(student);
             }
 
-            // Get pagination details from query params
             const { page = 1, limit = 10, name = '' } = req.query;
 
-            // Create a case-insensitive regex to match names if 'name' is provided
             const nameRegex = name ? new RegExp(`^${name}`, 'i') : null;
 
             const query = nameRegex ? { name: { $regex: nameRegex } } : {};
 
-            // Paginate using mongoose-paginate-v2
             const options = {
                 page: parseInt(page),
                 limit: parseInt(limit),
@@ -58,7 +52,6 @@ class StudentController {
         }
     }
 
-    // Update a student by ID
     async updateStudent(req, res) {
         try {
             const updatedStudent = await Student.findByIdAndUpdate(
@@ -73,7 +66,6 @@ class StudentController {
         }
     }
 
-    // Delete a student by ID
     async deleteStudent(req, res) {
         try {
             const id = req.params.id;

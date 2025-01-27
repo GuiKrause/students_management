@@ -3,38 +3,32 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import { faker } from '@faker-js/faker';
 
-// Models
 import User from '../models/userModel.js';
 import Student from '../models/studentModel.js';
 
 dotenv.config();
 
-// Database connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to the database'))
   .catch((err) => console.error('Database connection error:', err));
 
-// Fixed credentials
 const fixedEmail = 'test@example.com';
 const fixedPassword = 'SecurePassword123';
 const saltRounds = 10;
 
-// Generate users
 const generateUsers = async () => {
   const hashedPassword = await bcrypt.hash(fixedPassword, saltRounds);
   
-  // Add the fixed user and additional random users
   return [
     { email: fixedEmail, password: hashedPassword },
     ...Array.from({ length: 9 }, () => ({
       email: faker.internet.email(),
-      password: hashedPassword, // Same password for all users
+      password: hashedPassword,
     })),
   ];
 };
 
-// Generate 100 students with unique names
 const generateUniqueStudents = () => {
   const studentNames = new Set();
   const students = [];
@@ -54,7 +48,6 @@ const generateUniqueStudents = () => {
   return students;
 };
 
-// Seed the database
 const seedDatabase = async () => {
   try {
     await User.deleteMany({});
@@ -76,5 +69,4 @@ const seedDatabase = async () => {
   }
 };
 
-// Execute the seed function
 seedDatabase();

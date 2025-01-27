@@ -75,8 +75,6 @@ export default function Home() {
                 ? `http://localhost:3000/student/?page=${page}&name=${query}`
                 : `http://localhost:3000/student/?page=${page}`;
 
-            console.log('Fetching data from URL:', url); // Added for debugging
-
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
@@ -90,7 +88,6 @@ export default function Home() {
             }
 
             const data = await response.json();
-            console.log(data.data);
 
             setStudents(data.data);
             setCurrentPage(data.page);
@@ -105,27 +102,26 @@ export default function Home() {
     useEffect(() => {
         if (searchQuery.trim() !== "") {
             if (currentPage !== 1) {
-                setPreviousPage(currentPage); // Save the current page before resetting
-                setCurrentPage(1); // Reset to page 1 for a new search
+                setPreviousPage(currentPage);
+                setCurrentPage(1);
             }
         } else if (previousPage !== null) {
-            setCurrentPage(previousPage); // Restore previous page on clearing input
-            setPreviousPage(null); // Clear saved page
+            setCurrentPage(previousPage);
+            setPreviousPage(null);
         }
     }, [searchQuery]);
 
-    // Fetch students when currentPage changes
     useEffect(() => {
         if (currentPage) {
             fetchStudents(currentPage, debouncedSearchQuery);
-            navigate(`?page=${currentPage}`, { replace: true }); // Only navigate when currentPage actually changes
+            navigate(`?page=${currentPage}`, { replace: true });
         }
-    }, [currentPage, debouncedSearchQuery, navigate]);  // Fetch when currentPage changes
+    }, [currentPage, debouncedSearchQuery, navigate]);
 
     useEffect(() => {
         const debounced = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 500);  // 500ms debounce delay
+        }, 500);
 
         return () => clearTimeout(debounced);
     }, [searchQuery]);
@@ -147,7 +143,7 @@ export default function Home() {
                 throw new Error(`Failed to delete: ${response.statusText}`);
             }
 
-            fetchStudents(currentPage, debouncedSearchQuery);  // Refetch students after deletion
+            fetchStudents(currentPage, debouncedSearchQuery);
 
             toast({
                 title: "Sucesso!",
@@ -159,7 +155,6 @@ export default function Home() {
             setError(err instanceof Error ? err.message : 'Something went wrong');
         } finally {
             setLoading(false);
-            // Close the delete confirmation dialog after the operation
             setOpenDeleteDialog(false);
         }
 
@@ -180,15 +175,12 @@ export default function Home() {
 
     return (
         <>
-            {/* <header className="bg-[#EC622C] text-white text-center p-4 text-2xl justify-start flex">
-                <h1 className="font-bold lg:ml-8 text-3xl">CODETECH</h1>
-            </header> */}
             <SidebarProvider>
                 <AppSidebar />
                 <SidebarInset>
                     <SidebarTrigger />
-                    <main className="lg:mx-8">
-                        <section className="flex justify-between items-center mb-4">
+                    <main className="p-4 lg:mx-8">
+                        <section className="flex flex-col sm:flex-row justify-between items-center mb-4">
                             <h2 className="text-2xl font-semibold">Alunos</h2>
                             <Button onClick={() => handleNavigate('student')} size={"lg"} className="bg-orange-400 hover:bg-orange-600">Criar Registro</Button>
                         </section>
@@ -313,16 +305,14 @@ export default function Home() {
                                     </Table>
                                     <Pagination >
                                         <PaginationContent>
-                                            {/* Previous Button */}
                                             <PaginationItem>
                                                 <PaginationPrevious
                                                     className="cursor-pointer"
                                                     onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-                                                    isActive={currentPage === 1}
+                                                    isActive={false}
                                                 />
                                             </PaginationItem>
 
-                                            {/* First Pages (1, 2, 3) */}
                                             {Array.from({ length: Math.min(3, totalPages) }).map((_, index) => (
                                                 <PaginationItem key={index}>
                                                     <PaginationLink
@@ -335,14 +325,12 @@ export default function Home() {
                                                 </PaginationItem>
                                             ))}
 
-                                            {/* Ellipsis Before Current Page */}
                                             {currentPage > 4 && (
                                                 <PaginationItem>
                                                     <PaginationEllipsis />
                                                 </PaginationItem>
                                             )}
 
-                                            {/* Current Page */}
                                             {currentPage > 3 && currentPage <= totalPages - 3 && (
                                                 <PaginationItem>
                                                     <PaginationLink
@@ -355,14 +343,12 @@ export default function Home() {
                                                 </PaginationItem>
                                             )}
 
-                                            {/* Ellipsis After Current Page */}
                                             {currentPage < totalPages - 3 && (
                                                 <PaginationItem>
                                                     <PaginationEllipsis />
                                                 </PaginationItem>
                                             )}
 
-                                            {/* Last Pages (totalPages - 2, totalPages - 1, totalPages) */}
                                             {totalPages > 3 && (
                                                 <>
                                                     {Array.from({ length: 3 }).map((_, index) => (
@@ -379,12 +365,11 @@ export default function Home() {
                                                 </>
                                             )}
 
-                                            {/* Next Button */}
                                             <PaginationItem>
                                                 <PaginationNext
                                                     className="cursor-pointer"
                                                     onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
-                                                    isActive={currentPage === totalPages}
+                                                    isActive={false}
                                                 />
                                             </PaginationItem>
                                         </PaginationContent>

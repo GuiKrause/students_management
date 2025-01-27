@@ -115,19 +115,19 @@ export default function App() {
 
 
   return (
-    <div className="flex flex-row h-screen">
-      <div className="bg-[#EC622C] w-1/2 min-h-full flex items-center justify-center">
+    <div className="flex flex-col h-screen justify-center items-center lg:flex-row">
+      <div className="bg-[#EC622C] w-1/2 min-h-full hidden items-center justify-center lg:flex">
       </div>
       <div className="bg-[#FFFFFF] w-1/2 min-h-full gap-4 flex flex-col items-center justify-center relative">
-        <Tabs defaultValue="account" className="w-[400px]">
+        <Tabs defaultValue="login" className="w-[400px]">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="account">Entrar</TabsTrigger>
-            <TabsTrigger value="password">Registrar</TabsTrigger>
+            <TabsTrigger className="fade-left" value="login">Login</TabsTrigger>
+            <TabsTrigger className="fade-right" onClick={() => loginForm.reset()} value="registrar">Registrar</TabsTrigger>
           </TabsList>
-          <TabsContent value="account">
-            <Card>
+          <TabsContent value="login">
+            <Card className="animate-fade-left">
               <CardHeader>
-                <CardTitle className="text-2xl">Entrar</CardTitle>
+                <CardTitle className="text-2xl">Login</CardTitle>
                 <CardDescription>
                   Insira seu email e senha para acessar o sistema.
                 </CardDescription>
@@ -167,12 +167,12 @@ export default function App() {
               </CardContent>
             </Card>
           </TabsContent>
-          <TabsContent value="password">
-            <Card>
+          <TabsContent value="registrar">
+            <Card className="animate-fade-right">
               <CardHeader>
                 <CardTitle className="text-2xl">Registrar</CardTitle>
                 <CardDescription>
-                  Entre com seu email e senha para acessar o sistema.
+                  Realize o cadastro para acessar o sistema caso não tenha uma conta.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">

@@ -1,8 +1,7 @@
 export default async function login(credentials: any) {
-    const url = 'http://localhost:3000/auth/login'; // Replace with your API endpoint
+    const url = 'http://localhost:3000/auth/login';
 
     try {
-        // Send POST request with user credentials
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -11,16 +10,13 @@ export default async function login(credentials: any) {
             body: JSON.stringify(credentials),
         });
 
-        // Check if the request was successful
         if (!response.ok) {
             throw new Error(`Login failed: ${response.statusText}`);
         }
 
-        // Parse the response JSON
         const data = await response.json();
 
-        // Retrieve and return the token
-        const token = data.token; // Adjust this based on your API response structure
+        const token = data.token;
         if (!token) {
             throw new Error('Token not received from server');
         }
@@ -28,15 +24,14 @@ export default async function login(credentials: any) {
         return token;
     } catch (error) {
         console.error('Error during login:', error);
-        throw error; // Re-throw the error to handle it in the calling code
+        throw error;
     }
 }
 
 export async function register(credentials: any) {
-    const url = 'http://localhost:3000/auth/register'; // Replace with your API endpoint
+    const url = 'http://localhost:3000/auth/register';
 
     try {
-        // Send POST request with user credentials
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -45,7 +40,6 @@ export async function register(credentials: any) {
             body: JSON.stringify(credentials),
         });
 
-        // Check if the request was successful
         if (!response.ok) {
             throw new Error(`Registration failed: ${response.statusText}`);
         }
@@ -54,6 +48,6 @@ export async function register(credentials: any) {
 
     } catch (error) {
         console.error('Error during registration:', error);
-        throw error; // Re-throw the error to handle it in the calling code
+        throw error;
     }
 }

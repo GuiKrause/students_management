@@ -36,8 +36,8 @@ const formSchema = z.object({
             required_error: "Idade é obrigatória",
             invalid_type_error: "Idade deve ser um valor válido",
         })
-        .regex(/^\d+$/, "Idade deve conter apenas números inteiros") // Ensure it contains only digits
-        .max(2, "Idade deve ter no máximo 2 caracteres") // Limit the string length to 2 characters
+        .regex(/^\d+$/, "Idade deve conter apenas números inteiros")
+        .max(2, "Idade deve ter no máximo 2 caracteres")
         .refine((val) => parseInt(val, 10) >= 1 && parseInt(val, 10) <= 99, {
             message: "Idade deve estar entre 1 e 99",
         }),
@@ -77,7 +77,7 @@ export default function UserForm() {
 
     useEffect(() => {
         if (user != null) {
-            form.reset({ name: user.name, grade: user.grade, age: user.age.toString() }); // Set form values if user data is available
+            form.reset({ name: user.name, grade: user.grade, age: user.age.toString() });
         }
     }, [user, form]);
 
@@ -91,7 +91,7 @@ export default function UserForm() {
                     "Content-Type": "application/json",
                     'Authorization': `Bearer ${authToken}`,
                 },
-                body: JSON.stringify({ name: name, grade: grade, age: parsedAge }), // Send the form data as JSON
+                body: JSON.stringify({ name: name, grade: grade, age: parsedAge }),
             });
 
             if (!response.ok) {
@@ -128,7 +128,7 @@ export default function UserForm() {
                     "Content-Type": "application/json",
                     'Authorization': `Bearer ${authToken}`,
                 },
-                body: JSON.stringify({ name: name, grade: grade, age: parsedAge }), // Send the updated data as JSON
+                body: JSON.stringify({ name: name, grade: grade, age: parsedAge }),
             });
 
             if (!response.ok) {
@@ -163,7 +163,7 @@ export default function UserForm() {
                 <SidebarTrigger />
                 <main className="p-10 lg:mx-8">
                     <section className="flex justify-between items-center mb-10">
-                        <h2 className="text-2xl font-semibold">Cadastrar Aluno</h2>
+                        <h2 className="text-2xl font-semibold">{user == null ? "Cadastrar aluno": "Editar aluno"}</h2>
                     </section>
                     <section>
                         <Form {...form}>
@@ -173,7 +173,7 @@ export default function UserForm() {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Username</FormLabel>
+                                            <FormLabel>Nome</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="Digite o nome" {...field} />
                                             </FormControl>
