@@ -1,48 +1,66 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 import { faker } from '@faker-js/faker';
 
-// Models
 import User from '../models/userModel.js';
 import Student from '../models/studentModel.js';
 
 dotenv.config();
 
-// Database connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to the database'))
   .catch((err) => console.error('Database connection error:', err));
 
-// Generate 10 users using Faker
-const users = Array.from({ length: 10 }, () => ({
-  email: faker.internet.email(),
-  password: faker.internet.password(),
-}));
+const fixedEmail = 'test@example.com';
+const fixedPassword = 'SecurePassword123';
+const saltRounds = 10;
 
-// Generate 10 students using Faker
-const students = Array.from({ length: 10 }, () => ({
-  name: faker.person.fullName(),
-  age: faker.number.int({ min: 18, max: 25 }),
-  grade: faker.helpers.arrayElement(['A', 'B', 'C', 'D', 'E']),
-}));
+const generateUsers = async () => {
+  const hashedPassword = await bcrypt.hash(fixedPassword, saltRounds);
+  
+  return [
+    { email: fixedEmail, password: hashedPassword },
+    ...Array.from({ length: 9 }, () => ({
+      email: faker.internet.email(),
+      password: hashedPassword,
+    })),
+  ];
+};
 
-// Seed the database
+const generateUniqueStudents = () => {
+  const studentNames = new Set();
+  const students = [];
+
+  while (students.length < 100) {
+    const name = faker.person.fullName();
+    if (!studentNames.has(name)) {
+      studentNames.add(name);
+      students.push({
+        name,
+        age: faker.number.int({ min: 18, max: 25 }),
+        grade: faker.helpers.arrayElement(['A', 'B', 'C', 'D', 'E']),
+      });
+    }
+  }
+
+  return students;
+};
+
 const seedDatabase = async () => {
   try {
-    // Clear collections
     await User.deleteMany({});
     await Student.deleteMany({});
-
     console.log('Collections cleared.');
 
-    // Insert data
+    const users = await generateUsers();
     await User.insertMany(users);
-    console.log('10 users added.');
+    console.log('Users added.');
 
-    await Student.insertMany(students);
-    console.log('10 students added.');
-
+    const uniqueStudents = generateUniqueStudents();
+    await Student.insertMany(uniqueStudents);
+    console.log('Students added.');
   } catch (error) {
     console.error('Error seeding the database:', error);
   } finally {
@@ -51,5 +69,4 @@ const seedDatabase = async () => {
   }
 };
 
-// Execute the seed function
 seedDatabase();
