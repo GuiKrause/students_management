@@ -45,7 +45,15 @@ cp env.example .env
 - SECRET_KEY= # Qualquer palavra para uso como chave secreta
 - MONGO_URI= # URL de conexão com o MongoDB
 
-### Passo 3: Executando o sistema
+### Passo 3: Adicionando registro ao banco de dados
+
+1. Popular banco
+```
+cd backend
+npm run seed
+```
+
+### Passo 4: Executando o sistema
 
 1. Navegue até a pasta backend e inicie o servidor
 ```
@@ -59,7 +67,7 @@ cd frontend
 npm run dev
 ```
 
-### Passo 4: Utilização do sistema
+### Passo 5: Utilização do sistema
 
 Após executar o frontend verifique a url local que será fornecida algo como:
 
