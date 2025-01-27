@@ -163,7 +163,7 @@ export default function UserForm() {
                 <SidebarTrigger />
                 <main className="p-10 lg:mx-8">
                     <section className="flex justify-between items-center mb-10">
-                        <h2 className="text-2xl font-semibold">{user == null ? "Cadastrar aluno": "Editar aluno"}</h2>
+                        <h2 className="text-2xl font-semibold">{user == null ? "Cadastrar aluno" : "Editar aluno"}</h2>
                     </section>
                     <section>
                         <Form {...form}>
