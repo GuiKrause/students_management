@@ -72,8 +72,8 @@ export default function Home() {
         setLoading(true);
         try {
             const url = query
-                ? `http://localhost:3000/student/?page=${page}&name=${query}`
-                : `http://localhost:3000/student/?page=${page}`;
+                ? `https://students-management-gsrc.onrender.com/student/?page=${page}&name=${query}`
+                : `https://students-management-gsrc.onrender.com/student/?page=${page}`;
 
             const response = await fetch(url, {
                 method: "GET",
@@ -131,7 +131,7 @@ export default function Home() {
         setError(null);
 
         try {
-            const response = await fetch(`http://localhost:3000/student/${studentId}`, {
+            const response = await fetch(`https://students-management-gsrc.onrender.com/student/${studentId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

@@ -5,6 +5,4 @@ services:
     repo: https://github.com/GuiKrause/students_management
     plan: free
     branch: develop
-    buildCommand: cd backend && npm install
-    startCommand: npm start
         

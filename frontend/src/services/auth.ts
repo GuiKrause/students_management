@@ -1,5 +1,5 @@
 export default async function login(credentials: any) {
-    const url = 'http://localhost:3000/auth/login';
+    const url = 'https://students-management-gsrc.onrender.com/auth/login';
 
     try {
         const response = await fetch(url, {
@@ -29,7 +29,7 @@ export default async function login(credentials: any) {
 }
 
 export async function register(credentials: any) {
-    const url = 'http://localhost:3000/auth/register';
+    const url = 'https://students-management-gsrc.onrender.com/auth/register';
 
     try {
         const response = await fetch(url, {
