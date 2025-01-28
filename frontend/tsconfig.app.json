@@ -25,9 +25,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./build/*"
       ]
     }
   },
-  "include": ["src"]
+  "include": ["build"]
 }
