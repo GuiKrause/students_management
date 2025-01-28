@@ -85,7 +85,7 @@ export default function UserForm() {
         const { name, grade, age } = values;
         const parsedAge = parseInt(age);
         try {
-            const response = await fetch("http://localhost:3000/student/", {
+            const response = await fetch("https://students-management-gsrc.onrender.com/student/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -122,7 +122,7 @@ export default function UserForm() {
         const parsedAge = parseInt(age);
 
         try {
-            const response = await fetch(`http://localhost:3000/student/${id}`, {
+            const response = await fetch(`https://students-management-gsrc.onrender.com/student/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

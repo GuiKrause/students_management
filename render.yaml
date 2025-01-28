@@ -1,0 +1,8 @@
+services:
+  - type: web
+    runtime: node
+    name: codetech-website
+    repo: https://github.com/GuiKrause/students_management
+    plan: free
+    branch: develop
+        
