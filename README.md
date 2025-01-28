@@ -4,6 +4,11 @@ Este projeto foi desenvolvido como parte de um teste avaliativo com o objetivo d
 
 ---
 
+## Aplicação em Produção
+
+- [https://students-management-one.vercel.app/](https://students-management-one.vercel.app/)
+---
+
 ## ⚙️ Como Utilizar?
 
 Este guia explica como executar o sistema localmente. Certifique-se de seguir todas as etapas abaixo.
